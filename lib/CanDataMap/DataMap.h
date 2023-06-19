@@ -20,6 +20,31 @@ struct CANDataMap
             }
         } 
         
+        void updateMosfet(uint8_t value)
+        {
+            data[1][0] = value;
+            // switch (value)
+            // {
+            // case 0x53:
+            //     halfMosfetData.mosfetStatus.cmos = 1;
+            //     halfMosfetData.mosfetStatus.dmos = 0;
+            //     break;
+            // case 0x42:
+            //     halfMosfetData.mosfetStatus.cmos = 0;
+            //     halfMosfetData.mosfetStatus.dmos = 1;
+            //     break;
+            // case 0x31:
+            //     // Serial1.println("Data 0x31");
+            //     halfMosfetData.mosfetStatus.cmos = 1;
+            //     halfMosfetData.mosfetStatus.dmos = 1;
+            //     break;
+            // case 0x65:
+            //     halfMosfetData.mosfetStatus.cmos = 0;
+            //     halfMosfetData.mosfetStatus.dmos = 0;
+            //     break;
+            // }
+        }
+
         /**
          * @param packVoltage packVoltage in 0.01V, for 51,60V packVoltage param should be 5160
         */

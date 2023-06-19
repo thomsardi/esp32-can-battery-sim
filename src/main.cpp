@@ -2,6 +2,13 @@
 #include <CAN.h>
 #include <DataMap.h>
 
+const int potentioMeterPin = 36;
+const int voltageMinimum = 4500;
+const int voltageMaximum = 5000;
+const int currentMinimum = 0;
+const int currentMaximum = 500;
+const int socMinimum = 0;
+const int socMaximum = 1000;
 // CANDataMap canDataMap(0);
 CANDataMap canDataMap[16] = {
   CANDataMap(1),
@@ -23,7 +30,9 @@ CANDataMap canDataMap[16] = {
 };
 int batId = 0;
 int dataId = 0;
-int packVoltage = 4500;
+int minVoltage = 4550;
+int maxVoltage = 4850;
+int packVoltage = 4550;
 int packCurrent = 0;
 int packSoc = 0;
 bool isDecrease = false;
@@ -62,6 +71,10 @@ void setup() {
 }
 
 void loop() {
+  int potentioMeterValue = analogRead(potentioMeterPin);
+  int voltageMap = map(potentioMeterValue, 0, 4095, voltageMinimum, voltageMaximum);
+  int currentMap = map(potentioMeterValue, 0, 4095, currentMinimum, currentMaximum);
+  int socMap = map(potentioMeterValue, 0, 4095, socMinimum, socMaximum);
   // int packetSize = CAN.parsePacket();
 
   // if (packetSize) {
@@ -125,14 +138,28 @@ void loop() {
   for (size_t i = 0; i < 16; i++) // iterate over frame id, has 16 device
   {
     CANDataMap *dataMapPointer = dataP + i;
-    dataMapPointer->updatePackVoltage(5000);
-    dataMapPointer->updatePackCurrent(513);
-    dataMapPointer->updatePackSoc(257);
+    // dataMapPointer->updatePackVoltage(voltageMap);
+    // dataMapPointer->updatePackCurrent(currentMap);
+    // dataMapPointer->updatePackSoc(socMap);
+
+    if(i % 2 > 0)
+    {
+      Serial.println("Remainder");
+      // dataMapPointer->updateMosfet(0x53);
+    }
+    else
+    {
+      Serial.println("No Remainder");
+    }
+
+    // dataMapPointer->updatePackVoltage(5000);
+    // dataMapPointer->updatePackCurrent(513);
+    // dataMapPointer->updatePackSoc(257);
     if(dataId == 0)
     {
-      // dataMapPointer->updatePackVoltage(packVoltage);
-      // dataMapPointer->updatePackCurrent(packCurrent);
-      // dataMapPointer->updatePackSoc(packSoc);
+      dataMapPointer->updatePackVoltage(packVoltage);
+      dataMapPointer->updatePackCurrent(packCurrent);
+      dataMapPointer->updatePackSoc(packSoc);
     }
     p = dataMapPointer->data;
     // for (size_t j = 0; j < 11; j++) // iterate over each pack of data frame (1 data frame = 8 bytes )
@@ -163,7 +190,7 @@ void loop() {
     Serial.println();
     CAN.write(*(p+dataId), 8);
     CAN.endPacket();
-    delay(20);
+    // delay(20);
   }
   
   // Serial.println("done");
@@ -174,11 +201,11 @@ void loop() {
       packVoltage += 50;
       packCurrent += 10;
       packSoc += 5;
-      if(packVoltage >= 5000)
+      if(packVoltage >= maxVoltage)
       {
-        packVoltage = 5000;
-        packCurrent = 100;
-        packSoc = 50;
+        packVoltage = maxVoltage;
+        packCurrent = 60;
+        packSoc = 30;
         isDecrease = true;
       }
     }
@@ -187,9 +214,9 @@ void loop() {
       packVoltage -= 50;
       packCurrent -= 10;
       packSoc -= 5;
-      if(packVoltage <= 4500)
+      if(packVoltage <= minVoltage)
       {
-        packVoltage = 4500;
+        packVoltage = minVoltage;
         packCurrent = 0;
         packSoc = 0;
         isDecrease = false;
@@ -200,4 +227,5 @@ void loop() {
   dataId++;
   // Serial.println("Pack Voltage : " + String(packVoltage));
   // delay(1000);
+  delay(20);
 }
