@@ -99,6 +99,18 @@ struct CANDataMap
             data[0][7] = _highByte;
         }
 
+        void updateDmosTemperature(uint8_t temperature)
+        {
+            int val = 100 - temperature;
+            data[1][7] = val;
+        }
+
+        void updateCmosTemperature(uint8_t temperature)
+        {
+            int val = 100 - temperature;
+            data[1][6] = val;
+        }
+
         uint32_t frameId[11] = {
             0x0764c864,
             0x0763c864,

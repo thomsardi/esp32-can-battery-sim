@@ -146,11 +146,17 @@ void loop() {
     {
       Serial.println("Remainder");
       // dataMapPointer->updateMosfet(0x53);
+      // dataMapPointer->updateMosfet(0x65);
+      // dataMapPointer->updateCmosTemperature(51);
     }
     else
     {
       Serial.println("No Remainder");
+      // dataMapPointer->updateMosfet(0x65);
+      // dataMapPointer->updateCmosTemperature(41);
     }
+
+    
 
     // dataMapPointer->updatePackVoltage(5000);
     // dataMapPointer->updatePackCurrent(513);
