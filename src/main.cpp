@@ -35,6 +35,8 @@ int maxVoltage = 4850;
 int packVoltage = 4550;
 int packCurrent = 0;
 int packSoc = 0;
+int dmosTemperature = 0;
+int cmosTemperature = 0;
 bool isDecrease = false;
 CANDataMap *dataP = canDataMap;
 uint8_t (*p)[8] = canDataMap[0].data;
@@ -166,6 +168,8 @@ void loop() {
       dataMapPointer->updatePackVoltage(packVoltage);
       dataMapPointer->updatePackCurrent(packCurrent);
       dataMapPointer->updatePackSoc(packSoc);
+      dataMapPointer->updateCmosTemperature(cmosTemperature);
+      dataMapPointer->updateDmosTemperature(dmosTemperature);
     }
     p = dataMapPointer->data;
     // for (size_t j = 0; j < 11; j++) // iterate over each pack of data frame (1 data frame = 8 bytes )
@@ -207,11 +211,15 @@ void loop() {
       packVoltage += 50;
       packCurrent += 10;
       packSoc += 5;
+      cmosTemperature += 10;
+      dmosTemperature += 10;
       if(packVoltage >= maxVoltage)
       {
         packVoltage = maxVoltage;
         packCurrent = 60;
         packSoc = 30;
+        cmosTemperature = 60;
+        dmosTemperature = 60;
         isDecrease = true;
       }
     }
@@ -219,12 +227,16 @@ void loop() {
     {
       packVoltage -= 50;
       packCurrent -= 10;
+      cmosTemperature -= 10;
+      dmosTemperature -= 10;
       packSoc -= 5;
       if(packVoltage <= minVoltage)
       {
         packVoltage = minVoltage;
         packCurrent = 0;
         packSoc = 0;
+        cmosTemperature = 0;
+        dmosTemperature = 0;
         isDecrease = false;
       }
     }
